@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>CSQuest Leaderboard</title>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+    <style>
+      :root {
+        /* Background & Surfaces */
+        --bg-color: #f8fafc; /* Soft off-white to reduce eye strain compared to pure white */
+        --card-bg: rgba(
+          255,
+          255,
+          255,
+          0.85
+        ); /* Semi-transparent pure white for glassmorphism */
+
+        /* Typography */
+        --text-main: #0f172a; /* Deep slate for high contrast and readability */
+        --text-muted: #64748b; /* Medium slate for secondary info */
+
+        /* Accents */
+        --accent-blue: #0284c7;
+        --accent-glow: rgba(2, 132, 199, 0.15);
+        --border-color: rgba(
+          15,
+          23,
+          42,
+          0.08
+        ); /* Subtle dark border instead of white */
+
+        /* Refined Podium Colors (Kept vibrant, slightly tweaked silver) */
+        --gold: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+        --silver: linear-gradient(135deg, #f1f5f9 0%, #94a3b8 100%);
+        --bronze: linear-gradient(135deg, #d97706 0%, #92400e 100%);
+      }
+
+      body {
+        font-family: "Outfit", sans-serif;
+        background-color: var(--bg-color);
+        background-image:
+          radial-gradient(
+            circle at 15% 50%,
+            rgba(56, 189, 248, 0.05),
+            transparent 25%
+          ),
+          radial-gradient(
+            circle at 85% 30%,
+            rgba(139, 92, 246, 0.05),
+            transparent 25%
+          );
+        color: var(--text-main);
+        margin: 0;
+        padding: 0;
+        min-height: 100dvh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 600px;
+        padding: 20px;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+      }
+
+      /* --- HEADER --- */
+      .header {
+        text-align: center;
+        padding-top: 20px;
+        animation: fadeIn 0.8s ease;
+      }
+      .header h1 {
+        margin: 0;
+        font-size: 32px;
+        font-weight: 800;
+        color: var(--text-main);
+        letter-spacing: -0.5px;
+        text-shadow: 0 0 20px var(--accent-glow);
+      }
+      .header p {
+        margin: 8px 0 0 0;
+        color: var(--accent-blue);
+        font-weight: 600;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+      }
+
+      /* --- PODIUM PILLARS (Top 3) --- */
+      .podium-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: flex-end;
+        gap: 12px;
+        height: 260px;
+        margin: 20px 0;
+      }
+
+      .pillar-placeholder {
+        flex: 1;
+        max-width: 140px;
+      }
+
+      .pillar {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-end;
+        flex: 1;
+        max-width: 140px;
+        border-radius: 16px 16px 4px 4px;
+        color: #0f172a;
+        padding: 20px 10px;
+        text-align: center;
+        position: relative;
+        opacity: 0;
+        transform: translateY(40px);
+        animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
+
+      @keyframes slideUp {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      .pillar.rank-1 {
+        height: 90%;
+        background: var(--gold);
+        z-index: 3;
+        animation-delay: 0.1s;
+        box-shadow: 0 -10px 30px rgba(251, 191, 36, 0.3);
+      }
+      .pillar.rank-2 {
+        height: 75%;
+        background: var(--silver);
+        z-index: 2;
+        animation-delay: 0.3s;
+        box-shadow: 0 -5px 20px rgba(148, 163, 184, 0.2);
+      }
+      .pillar.rank-3 {
+        height: 60%;
+        background: var(--bronze);
+        z-index: 1;
+        animation-delay: 0.5s;
+        box-shadow: 0 -5px 20px rgba(217, 119, 6, 0.2);
+      }
+
+      .pillar .rank-badge {
+        width: 36px;
+        height: 36px;
+        background: var(--bg-color);
+        color: var(--text-main);
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: 800;
+        font-size: 18px;
+        position: absolute;
+        top: -18px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        border: 2px solid;
+      }
+      .pillar.rank-1 .rank-badge {
+        border-color: #fbbf24;
+      }
+      .pillar.rank-2 .rank-badge {
+        border-color: #cbd5e1;
+      }
+      .pillar.rank-3 .rank-badge {
+        border-color: #d97706;
+      }
+
+      .pillar .name {
+        font-weight: 800;
+        font-size: 15px;
+        margin-bottom: 8px;
+        line-height: 1.2;
+        word-break: break-word;
+      }
+
+      .pillar .score {
+        font-size: 18px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(255, 255, 255, 0.3);
+        padding: 4px 10px;
+        border-radius: 20px;
+      }
+
+      /* --- CONTINUOUS LIST (Rank 4+) --- */
+      .list-container {
+        background: var(--card-bg);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 10px 20px;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      }
+
+      .list-item {
+        display: flex;
+        align-items: center;
+        padding: 16px 0;
+        border-bottom: 1px solid var(--border-color);
+        animation: fadeIn 0.5s ease forwards;
+        opacity: 0;
+      }
+      .list-item:last-child {
+        border-bottom: none;
+      }
+
+      .list-rank {
+        width: 40px;
+        font-weight: 800;
+        color: var(--text-muted);
+        font-size: 16px;
+      }
+      .list-name {
+        flex: 1;
+        font-weight: 600;
+        font-size: 16px;
+        color: var(--text-main);
+      }
+      .list-score {
+        font-weight: 700;
+        font-size: 16px;
+        color: var(--accent-blue);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(56, 189, 248, 0.1);
+        padding: 6px 12px;
+        border-radius: 12px;
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 40px;
+        color: var(--text-muted);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+      }
+
+      /* Responsive adjustments */
+      @media (max-width: 400px) {
+        .pillar .name {
+          font-size: 13px;
+        }
+        .pillar .score {
+          font-size: 14px;
+        }
+        .pillar.rank-1 {
+          height: 95%;
+        }
+        .pillar.rank-2 {
+          height: 75%;
+        }
+        .pillar.rank-3 {
+          height: 60%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>Live Leaderboard</h1>
+        <p>CSQuest • CS/IT Dept JU</p>
+      </div>
+
+      <div class="podium-wrapper" id="podium"></div>
+
+      <div class="list-container" id="leaderboard-list">
+        <div class="empty-state">
+          <i
+            data-lucide="loader-2"
+            class="lucide-spin"
+            style="width: 32px; height: 32px; color: var(--accent-blue)"
+          ></i>
+          <p>Syncing network data...</p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // --- FIREBASE SETUP ---
+      const firebaseConfig = {
+        apiKey: "AIzaSyCsWsFFR3al6wtHN8hHaWhd4Bg_czERhWw",
+        authDomain: "leaderboard-a2fab.firebaseapp.com",
+        databaseURL:
+          "https://leaderboard-a2fab-default-rtdb.asia-southeast1.firebasedatabase.app/",
+        projectId: "leaderboard-a2fab",
+        storageBucket: "leaderboard-a2fab.firebasestorage.app",
+        messagingSenderId: "97427058083",
+        appId: "1:97427058083:web:148b95cf8d766e2013be16",
+      };
+
+      if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+      }
+      const db = firebase.database();
+
+      // Initialize initial icons
+      lucide.createIcons();
+
+      // --- RENDER LOGIC ---
+      db.ref("players").on("value", (snapshot) => {
+        const players = [];
+
+        // 1. Gather and Sort Data
+        snapshot.forEach((child) => {
+          const p = child.val();
+          if (p.data && p.data > 0) {
+            players.push({
+              id: child.key,
+              name: p.name || child.key,
+              data: p.data || 0,
+            });
+          }
+        });
+
+        // Sort Descending (Highest data first)
+        players.sort((a, b) => b.data - a.data);
+
+        const podiumEl = document.getElementById("podium");
+        const listEl = document.getElementById("leaderboard-list");
+
+        // Empty states handling
+        if (players.length === 0) {
+          podiumEl.innerHTML = "";
+          listEl.style.display = "block";
+          listEl.innerHTML = `
+          <div class="empty-state">
+            <i data-lucide="database-zap" style="width: 32px; height: 32px; color: var(--text-muted);"></i>
+            <p>No data uploaded yet. The network is quiet.</p>
+          </div>`;
+          lucide.createIcons();
+          return;
+        }
+
+        // --- 2. BUILD PODIUM (Top 3) ---
+        const p1 = players[0];
+        const p2 = players[1];
+        const p3 = players[2];
+
+        let podiumHTML = "";
+
+        // Add Rank 2 (Left)
+        podiumHTML += p2
+          ? createPillarHTML(p2, 2)
+          : '<div class="pillar-placeholder"></div>';
+        // Add Rank 1 (Center)
+        podiumHTML += p1 ? createPillarHTML(p1, 1) : "";
+        // Add Rank 3 (Right)
+        podiumHTML += p3
+          ? createPillarHTML(p3, 3)
+          : '<div class="pillar-placeholder"></div>';
+
+        podiumEl.innerHTML = podiumHTML;
+
+        // --- 3. BUILD CONTINUOUS LIST (Rank 4+) ---
+        if (players.length > 3) {
+          listEl.style.display = "block"; // FIXED: Ensure list reappears if it was hidden
+          let listHTML = "";
+
+          for (let i = 3; i < players.length; i++) {
+            // Add staggered animation delay based on index
+            const delay = (i - 3) * 0.1;
+            listHTML += `
+            <div class="list-item" style="animation-delay: ${delay}s">
+              <div class="list-rank">#${i + 1}</div>
+              <div class="list-name">${players[i].name}</div>
+              <div class="list-score">
+                ${players[i].data.toLocaleString()} <i data-lucide="database" style="width: 16px; height: 16px;"></i>
+              </div>
+            </div>
+          `;
+          }
+          listEl.innerHTML = listHTML;
+        } else {
+          // FIXED: Properly hide the list card entirely if nobody is in 4th place
+          listEl.style.display = "none";
+        }
+
+        // Re-initialize icons for the newly injected HTML
+        lucide.createIcons();
+      });
+
+      // Helper to build the pillar blocks
+      function createPillarHTML(player, rank) {
+        return `
+        <div class="pillar rank-${rank}">
+          <div class="rank-badge">${rank}</div>
+          <div class="name">${player.name}</div>
+          <div class="score"><i data-lucide="database" style="width: 14px; height: 14px;"></i> ${player.data.toLocaleString()}</div>
+        </div>
+      `;
+      }
+    </script>
+  </body>
+</html>

@@ -77,10 +77,31 @@
                 display: flex;
                 align-items: center;
                 gap: 8px;
+                margin-bottom: 6px;
               "
             >
               <i data-lucide="map" size="18"></i> Tactical Area Map
             </h3>
+            <p
+              style="
+                font-size: 12px;
+                color: var(--mantine-dimmed);
+                line-height: 1.4;
+                margin: 0;
+              "
+            >
+              Navigate to map pins to find physical QRs. <br />
+              <span style="color: var(--mantine-blue); font-weight: bold"
+                >Blue</span
+              >
+              = Active &nbsp;|&nbsp;
+              <span style="color: var(--warning-color); font-weight: bold"
+                >Orange</span
+              >
+              = Mega &nbsp;|&nbsp;
+              <span style="color: #adb5bd; font-weight: bold">Grey</span> =
+              Empty/Scanned
+            </p>
           </div>
           <div
             id="map-container"
@@ -89,40 +110,63 @@
         </div>
 
         <div id="view-scan" class="view">
-          <h3
-            style="
-              margin-bottom: 12px;
-              font-size: 16px;
-              display: flex;
-              align-items: center;
-              gap: 8px;
-            "
-          >
-            <i data-lucide="scan" size="18"></i> Extract Packets
-          </h3>
+          <div style="padding: 0 16px">
+            <h3
+              style="
+                margin-bottom: 8px;
+                font-size: 16px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+              "
+            >
+              <i data-lucide="scan" size="18"></i> Extract Packets
+            </h3>
+            <p
+              style="
+                font-size: 13px;
+                color: var(--mantine-dimmed);
+                margin-bottom: 16px;
+                line-height: 1.4;
+              "
+            >
+              Found a physical node on campus? Scan its QR code here to extract
+              packets. Watch your inventory limit (Max 50)!
+            </p>
+            <p
+              style="
+                font-size: 13px;
+                color: var(--mantine-dimmed);
+                margin-bottom: 16px;
+                line-height: 1.4;
+              "
+            >
+              Move to the Computer Science Stall to scan the Master Uplink QR.
+              and unlock the Reward.
+            </p>
+            <div
+              id="reader-scan"
+              style="
+                width: 100%;
+                border-radius: 12px;
+                overflow: hidden;
+                border: 2px solid var(--mantine-border);
+                background: black;
+              "
+            ></div>
 
-          <div
-            id="reader-scan"
-            style="
-              width: 100%;
-              border-radius: 12px;
-              overflow: hidden;
-              border: 2px solid var(--mantine-border);
-              background: black;
-            "
-          ></div>
-
-          <div
-            class="scan-feedback"
-            id="scan-feedback"
-            style="
-              color: var(--mantine-dimmed);
-              text-align: center;
-              margin-top: 16px;
-              font-weight: 600;
-            "
-          >
-            Camera active. Aim at a Node QR.
+            <div
+              class="scan-feedback"
+              id="scan-feedback"
+              style="
+                color: var(--mantine-dimmed);
+                text-align: center;
+                margin-top: 16px;
+                font-weight: 600;
+              "
+            >
+              Camera active. Aim at a Node QR.
+            </div>
           </div>
         </div>
 
@@ -137,6 +181,20 @@
               Mainframe Uplink
             </h2>
 
+            <p
+              style="
+                font-size: 13px;
+                color: var(--mantine-dimmed);
+                margin-bottom: 4px;
+                line-height: 1.4;
+              "
+            >
+              Return to the Admin Stall to secure your data. <br />
+              <span style="color: var(--warning-color); font-weight: 600"
+                >Warning: The Market Rate fluctuates!</span
+              >
+            </p>
+
             <div
               style="
                 margin-top: 16px;
@@ -149,6 +207,11 @@
                 <span id="ui-market-rate">--</span>
                 <i data-lucide="database" size="28"></i>
               </div>
+              <p
+                style="font-size: 12px; color: var(--mantine-dimmed); margin: 0"
+              >
+                per 1 packet uploaded
+              </p>
             </div>
 
             <div style="margin-top: 20px">

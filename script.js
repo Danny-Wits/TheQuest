@@ -219,7 +219,8 @@ async function onScanSuccess(decodedText) {
         }
 
         const available = nodeData.packetCount;
-        const takeAmount = Math.min(spaceLeft, available);
+        const extractionLimit = 25;
+        const takeAmount = Math.min(spaceLeft, available, extractionLimit);
 
         db.ref(`nodes/${nodeId}`).transaction(
           (currentNode) => {
