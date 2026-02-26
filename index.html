@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>CSQuest</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="style.css" />
+    <script
+      src="https://unpkg.com/html5-qrcode"
+      type="text/javascript"
+    ></script>
+
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  </head>
+  <body>
+    <div class="app-container">
+      <div id="auth-overlay">
+        <i
+          data-lucide="shield-alert"
+          size="48"
+          style="color: var(--danger-color); margin-bottom: 16px"
+        ></i>
+        <h2 style="color: var(--mantine-title); margin-bottom: 8px">
+          Authentication Required
+        </h2>
+        <p style="color: var(--mantine-dimmed); font-size: 14px">
+          Please scan a valid provisioning QR code at the Admin Terminal to
+          access CSQuest.
+        </p>
+      </div>
+
+      <div class="status-bar">
+        <div class="stat-box">
+          <span class="stat-label" id="player-name">Node Loading...</span>
+          <span class="stat-value data"
+            ><i data-lucide="database" size="18"></i>
+            <span id="ui-data">0</span></span
+          >
+        </div>
+        <div class="stat-box" style="align-items: flex-end">
+          <span class="stat-label">Inventory</span>
+          <span class="stat-value packets"
+            ><i data-lucide="box" size="18"></i>
+            <span id="ui-packets">0</span>/50</span
+          >
+        </div>
+      </div>
+
+      <div class="view-area">
+        <div id="view-map" class="view active">
+          <div
+            style="
+              padding: 16px 20px;
+              background: var(--mantine-card-bg);
+              z-index: 10;
+              box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            "
+          >
+            <h3
+              style="
+                font-size: 16px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+              "
+            >
+              <i data-lucide="map" size="18"></i> Tactical Area Map
+            </h3>
+          </div>
+          <div
+            id="map-container"
+            style="flex: 1; width: 100%; background: #000"
+          ></div>
+        </div>
+
+        <div id="view-scan" class="view">
+          <h3
+            style="
+              margin-bottom: 12px;
+              font-size: 16px;
+              display: flex;
+              align-items: center;
+              gap: 8px;
+            "
+          >
+            <i data-lucide="scan" size="18"></i> Extract Packets
+          </h3>
+
+          <div
+            id="reader-scan"
+            style="
+              width: 100%;
+              border-radius: 12px;
+              overflow: hidden;
+              border: 2px solid var(--mantine-border);
+              background: black;
+            "
+          ></div>
+
+          <div
+            class="scan-feedback"
+            id="scan-feedback"
+            style="
+              color: var(--mantine-dimmed);
+              text-align: center;
+              margin-top: 16px;
+              font-weight: 600;
+            "
+          >
+            Camera active. Aim at a Node QR.
+          </div>
+        </div>
+
+        <div id="view-base" class="view">
+          <div class="base-card" style="padding: 20px 16px; margin: 0">
+            <i
+              data-lucide="server"
+              size="40"
+              style="color: var(--mantine-title); margin-bottom: 12px"
+            ></i>
+            <h2 style="color: var(--mantine-title); margin-bottom: 8px">
+              Mainframe Uplink
+            </h2>
+
+            <div
+              style="
+                margin-top: 16px;
+                padding-bottom: 16px;
+                border-bottom: 1px solid var(--mantine-border);
+              "
+            >
+              <span class="stat-label">Current Market Rate</span>
+              <div class="current-rate-display" style="margin: 8px 0">
+                <span id="ui-market-rate">--</span>
+                <i data-lucide="database" size="28"></i>
+              </div>
+            </div>
+
+            <div style="margin-top: 20px">
+              <h3
+                style="
+                  font-size: 14px;
+                  color: var(--mantine-text);
+                  margin-bottom: 10px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  gap: 6px;
+                "
+              >
+                <i data-lucide="qr-code" size="16"></i> Scan Master QR to Upload
+              </h3>
+
+              <div
+                id="reader-base"
+                style="
+                  width: 100%;
+                  border-radius: 12px;
+                  overflow: hidden;
+                  border: 2px solid var(--mantine-border);
+                  background: black;
+                "
+              ></div>
+
+              <div
+                class="scan-feedback"
+                id="base-scan-feedback"
+                style="
+                  color: var(--mantine-dimmed);
+                  font-size: 13px;
+                  margin-top: 8px;
+                  text-align: center;
+                  font-weight: 600;
+                "
+              >
+                Camera active. Aim at the Admin Stall QR.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-nav">
+        <button class="nav-item active" onclick="switchView('map')">
+          <i data-lucide="map" size="24"></i> Map
+        </button>
+        <button class="nav-item" onclick="switchView('scan')">
+          <i data-lucide="camera" size="24"></i> Scan
+        </button>
+        <button class="nav-item" onclick="switchView('base')">
+          <i data-lucide="server" size="24"></i> Base
+        </button>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CSQuest - Admin Console</title>
+    <link rel="stylesheet" href="admin.css">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+   
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="header-title">
+        <i data-lucide="terminal-square" stroke-width="2.5"></i>
+        CSQuest Admin
+      </h1>
+
+      <div class="tabs">
+        <button
+          onclick="switchTab('generator')"
+          id="tab-generator"
+          class="nav-btn active"
+        >
+          <i data-lucide="user-plus" size="18"></i> Provision Account
+        </button>
+        <button onclick="switchTab('market')" id="tab-market" class="nav-btn">
+          <i data-lucide="bar-chart-2" size="18"></i> Server Market
+        </button>
+        <button
+          onclick="switchTab('leaderboard')"
+          id="tab-leaderboard"
+          class="nav-btn"
+        >
+          <i data-lucide="trophy" size="18"></i> Global Leaderboard
+        </button>
+        <button
+          onclick="switchTab('map-editor')"
+          id="tab-map-editor"
+          class="nav-btn"
+        >
+          <i data-lucide="map-pin" size="18"></i> Map Editor
+        </button>
+        <button
+          onclick="switchTab('node-qrs')"
+          id="tab-node-qrs"
+          class="nav-btn"
+        >
+          <i data-lucide="grid" size="18"></i> Node QRs
+        </button>
+      </div>
+
+      <div id="generator" class="tab-content active">
+        <div class="mantine-card">
+          <h2 class="card-title">Generate Access Token</h2>
+          <div class="input-group">
+            <label class="input-label">Node Identifier (Player Name)</label>
+            <input
+              type="text"
+              id="playerName"
+              class="mantine-input"
+              placeholder="e.g. Neo"
+            />
+          </div>
+          <button onclick="generateAccount()" class="mantine-btn">
+            <i data-lucide="qr-code" size="18"></i> Generate QR Token
+          </button>
+
+          <div id="qrResult" class="qr-container">
+            <div id="qrcode"></div>
+            <span
+              class="input-label"
+              style="color: var(--mantine-dimmed); margin-bottom: 0"
+              >Scan to Authenticate</span
+            >
+            <span id="loginUrl" class="login-url"></span>
+          </div>
+        </div>
+      </div>
+
+      <div id="market" class="tab-content">
+        <div class="mantine-card">
+          <h2
+            class="card-title"
+            style="
+              color: var(--mantine-dimmed);
+              text-transform: uppercase;
+              font-size: 14px;
+              margin-bottom: 0;
+            "
+          >
+            Current Exchange Rate
+          </h2>
+          <div class="market-rate">
+            <span style="display: flex; align-items: center; gap: 8px"
+              ><i data-lucide="box" size="36"></i> 1</span
+            >
+            <span class="market-equals">=</span>
+            <span class="market-value"
+              ><i data-lucide="database" size="32"></i>
+              <span id="current-price">85</span></span
+            >
+          </div>
+          <p style="color: var(--mantine-dimmed); font-size: 14px">
+            1 Packet = X Data. Rate syncs automatically.
+          </p>
+
+          <div class="btn-row">
+            <button onclick="forceCrash()" class="mantine-btn btn-danger">
+              <i data-lucide="trending-down" size="18"></i> Force Crash
+            </button>
+            <button onclick="forceSpike()" class="mantine-btn btn-success">
+              <i data-lucide="trending-up" size="18"></i> Force Spike
+            </button>
+          </div>
+          <div style="margin-top: 32px; padding: 16px; background: var(--mantine-bg); border-radius: 8px; border: 1px dashed var(--mantine-border); display: flex; flex-direction: column; align-items: center;">
+          <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 12px; color: var(--mantine-title);">Master Uplink QR</h3>
+          <div id="master-qr-box" style="padding: 10px; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);"></div>
+          <p style="font-size: 12px; color: var(--mantine-dimmed); margin-top: 12px; text-transform: uppercase;">THE MASTER UPLINK</p>
+        </div>
+        </div>
+      </div>
+
+      <div id="leaderboard" class="tab-content wide">
+        <div class="mantine-card" style="padding: 24px;">
+        <div class="table-responsive">
+          <table class="mantine-table">
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Node Name</th>
+                <th>Total Data</th>
+                <th>Packets Held</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboard-body">
+              <tr><td colspan="4" style="text-align: center; color: var(--mantine-dimmed); padding: 30px;">Awaiting connection...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        </div>
+        </div>
+      </div>
+
+      <div id="map-editor" class="tab-content wide">
+        <div
+          class="mantine-card"
+          style="
+            padding: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 600px;
+          "
+        >
+          <div
+            style="
+              padding: 16px;
+              background: var(--mantine-bg);
+              border-bottom: 1px solid var(--mantine-border);
+              text-align: left;
+            "
+          >
+            <h2 class="card-title" style="margin-bottom: 4px; font-size: 16px">
+              Deploy Physical Nodes
+            </h2>
+            <p style="color: var(--mantine-dimmed); font-size: 13px">
+              Click anywhere on the satellite map to drop a new QR Node.
+            </p>
+          </div>
+
+          <div
+            id="admin-map-container"
+            style="flex: 1; width: 100%; background: #000; cursor: crosshair"
+          ></div>
+
+          <div
+            style="
+              padding: 16px;
+              border-top: 1px solid var(--mantine-border);
+              display: flex;
+              flex-wrap: wrap;
+              gap: 12px;
+              align-items: center;
+              background: white;
+            "
+          >
+            <input
+              type="text"
+              id="node-id"
+              class="mantine-input"
+              placeholder="Node ID"
+              style="flex: 1; min-width: 120px"
+            />
+            <input
+              type="text"
+              id="node-lat"
+              class="mantine-input"
+              placeholder="Lat"
+              readonly
+              style="width: 90px; background: var(--mantine-bg)"
+            />
+            <input
+              type="text"
+              id="node-lng"
+              class="mantine-input"
+              placeholder="Lng"
+              readonly
+              style="width: 90px; background: var(--mantine-bg)"
+            />
+
+            <input
+              type="number"
+              id="node-capacity"
+              class="mantine-input"
+              placeholder="Capacity"
+              value="50"
+              style="
+                width: 100px;
+                font-weight: bold;
+                color: var(--mantine-blue);
+              "
+            />
+
+            <label
+              style="
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                font-size: 14px;
+                font-weight: 500;
+                cursor: pointer;
+              "
+            >
+              <input
+                type="checkbox"
+                id="node-mega"
+                style="width: 16px; height: 16px"
+              />
+              Mega
+            </label>
+
+            <button
+              onclick="saveNode()"
+              class="mantine-btn"
+              style="width: auto; padding: 10px 20px"
+            >
+              <i data-lucide="save" size="18"></i> Deploy
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div id="node-qrs" class="tab-content wide">
+        <div class="mantine-card" style="padding: 24px; text-align: left">
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              border-bottom: 1px solid var(--mantine-border);
+              padding-bottom: 16px;
+            "
+          >
+            <div>
+              <h2 class="card-title" style="margin-bottom: 4px">
+                Active Physical Nodes
+              </h2>
+              <p style="color: var(--mantine-dimmed); font-size: 13px">
+                Live directory of deployed QRs. Print this page for physical
+                setup.
+              </p>
+            </div>
+            <button
+              onclick="window.print()"
+              class="mantine-btn"
+              style="width: auto; padding: 10px 20px"
+            >
+              <i data-lucide="printer" size="18"></i> Print Sheet
+            </button>
+          </div>
+
+          <div id="qr-grid" class="qr-grid"></div>
+         <div class="no-print" style="margin-top: 40px; border-top: 2px solid var(--mantine-border); padding-top: 20px;">
+          <h3 style="font-size: 16px; margin-bottom: 16px; color: var(--mantine-title);">Live Capacity Editor</h3>
+          <div id="node-edit-list" style="display: flex; flex-direction: column; gap: 8px;"></div>
+        </div>
+        </div>
+        </div>
+      </div>
+    </div>
+
+   <script src="admin.js"></script>
+  </body>
+</html>

@@ -1,0 +1,508 @@
+:root {
+  --mantine-blue: #228be6;
+  --mantine-blue-hover: #1c7ed6;
+  --mantine-bg: #f8f9fa;
+  --mantine-card-bg: #ffffff;
+  --mantine-border: #ced4da;
+  --mantine-text: #495057;
+  --mantine-title: #212529;
+  --mantine-dimmed: #868e96;
+  --success-color: #40c057;
+  --danger-color: #fa5252;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family:
+    "Inter",
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+  background-color: var(--mantine-bg);
+  color: var(--mantine-text);
+  display: flex;
+  justify-content: center;
+  padding: 40px 20px;
+  min-height: 100vh;
+}
+
+.container {
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.header-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--mantine-title);
+  margin-bottom: 30px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Navigation Tabs */
+.tabs {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  border-bottom: 2px solid var(--mantine-border);
+  margin-bottom: 30px;
+  width: 100%;
+  max-width: 600px;
+}
+
+.nav-btn {
+  background: none;
+  border: none;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--mantine-dimmed);
+  padding: 10px 0;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-btn:hover {
+  color: var(--mantine-blue);
+}
+.nav-btn.active {
+  color: var(--mantine-blue);
+  font-weight: 600;
+}
+.nav-btn.active::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: var(--mantine-blue);
+}
+
+/* Cards & Layout */
+.tab-content {
+  display: none;
+  width: 100%;
+  max-width: 500px;
+  animation: fadeIn 0.3s ease;
+}
+.tab-content.active {
+  display: block;
+}
+.tab-content.wide {
+  max-width: 700px;
+}
+
+.mantine-card {
+  background: var(--mantine-card-bg);
+  border: 1px solid var(--mantine-border);
+  border-radius: 8px;
+  padding: 32px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.card-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--mantine-title);
+  margin-bottom: 24px;
+}
+
+/* Inputs & Buttons */
+.input-group {
+  width: 100%;
+  margin-bottom: 20px;
+  text-align: left;
+}
+.input-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.mantine-input {
+  width: 100%;
+  border: 1px solid var(--mantine-border);
+  border-radius: 4px;
+  padding: 10px 14px;
+  font-size: 15px;
+  font-family: inherit;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+  outline: none;
+}
+.mantine-input:focus {
+  border-color: var(--mantine-blue);
+  box-shadow: 0 0 0 3px rgba(34, 139, 230, 0.15);
+}
+
+.mantine-btn {
+  width: 100%;
+  background-color: var(--mantine-blue);
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 15px;
+  font-family: inherit;
+  transition: background-color 0.15s;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+.mantine-btn:hover {
+  background-color: var(--mantine-blue-hover);
+}
+
+.btn-danger {
+  background-color: var(--danger-color);
+}
+.btn-danger:hover {
+  background-color: #e03131;
+}
+.btn-success {
+  background-color: var(--success-color);
+}
+.btn-success:hover {
+  background-color: #2f9e44;
+}
+
+/* QR Result Area */
+.qr-container {
+  margin-top: 24px;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+}
+.qr-container.active {
+  display: flex;
+}
+#qrcode {
+  padding: 12px;
+  border: 1px solid var(--mantine-border);
+  border-radius: 8px;
+  background: white;
+  margin-bottom: 12px;
+}
+.login-url {
+  font-size: 12px;
+  color: var(--mantine-blue);
+  word-break: break-all;
+  margin-top: 4px;
+}
+
+/* Market Display */
+.market-rate {
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--mantine-title);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin: 24px 0;
+}
+.market-equals {
+  color: var(--mantine-border);
+  font-size: 24px;
+}
+.market-value {
+  color: var(--success-color);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-row {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--mantine-border);
+}
+
+/* Table */
+.mantine-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+.mantine-table th {
+  padding: 14px;
+  border-bottom: 2px solid var(--mantine-border);
+  color: var(--mantine-dimmed);
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.mantine-table td {
+  padding: 16px 14px;
+  border-bottom: 1px solid #e9ecef;
+  font-size: 15px;
+}
+.data-text {
+  color: var(--success-color);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/* Custom Leaflet Node Markers with Text */
+.leaflet-div-icon {
+  background: transparent;
+  border: none;
+}
+
+.map-node {
+  width: 32px;
+  height: 32px;
+  background-color: var(--mantine-blue);
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  transition: all 0.3s ease;
+
+  /* Flexbox to center the number */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 13px;
+  text-shadow: 0px 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+.map-node.inactive {
+  background-color: var(--mantine-dimmed);
+  opacity: 0.6;
+  color: transparent; /* Hide number when dead */
+}
+
+.map-node.mega {
+  background-color: var(--warning-color);
+  animation: pulse-ring 1.5s infinite;
+  font-size: 14px;
+}
+
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(245, 159, 0, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 15px rgba(245, 159, 0, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(245, 159, 0, 0);
+  }
+}
+/* QR Grid Styles */
+.qr-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+.qr-card {
+  border: 1px solid var(--mantine-border);
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: white;
+  text-align: center;
+}
+.qr-card-title {
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 4px;
+  color: var(--mantine-title);
+}
+.qr-card-data {
+  font-size: 12px;
+  color: var(--mantine-dimmed);
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+/* Responsive Table Wrapper */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Mobile Responsive Rules */
+@media (max-width: 768px) {
+  body {
+    padding: 20px 10px;
+  }
+  .header-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+
+  /* Fix Tabs for Mobile */
+  .tabs {
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  .nav-btn {
+    font-size: 13px;
+    padding: 8px 12px;
+  }
+
+  /* Adjust Cards & Map */
+  .mantine-card {
+    padding: 20px;
+  }
+  .map-editor-card {
+    height: auto !important;
+  }
+  #admin-map-container {
+    height: 400px !important;
+  }
+
+  /* Make Map Editor Inputs Stack */
+  .editor-controls {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 16px !important;
+  }
+  .editor-controls input,
+  .editor-controls button {
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  /* Fix Market Screen */
+  .market-rate {
+    font-size: 32px;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .market-equals {
+    transform: rotate(90deg);
+    margin: 10px 0;
+  }
+  .btn-row {
+    flex-direction: column;
+    gap: 12px;
+  }
+}
+/* Branded Text Styling */
+.qr-dept {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--mantine-blue);
+  text-transform: uppercase;
+  margin-top: 10px;
+  letter-spacing: 1px;
+}
+.qr-instruction {
+  font-size: 14px;
+  font-weight: 700;
+  color: #000;
+  text-transform: uppercase;
+  margin-bottom: 15px;
+  letter-spacing: 1px;
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 0.5cm;
+  }
+  body {
+    background: white;
+    padding: 0;
+  }
+  .tabs,
+  .header-title,
+  .mantine-btn,
+  .no-print,
+  .card-title,
+  p,
+  .qr-card-data {
+    display: none !important;
+  }
+
+  .container {
+    max-width: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  .tab-content {
+    display: none !important;
+  }
+  #node-qrs {
+    display: block !important;
+  }
+
+  .qr-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 20px !important;
+    padding: 20px;
+  }
+
+  .qr-card {
+    border: 4px solid #000;
+    aspect-ratio: 1 / 1; /* Forces square shape */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    page-break-inside: avoid;
+    padding: 20px !important;
+  }
+
+  .qr-card-title {
+    font-size: 28px !important;
+    margin-bottom: 15px !important;
+    border-bottom: 2px solid #000;
+    padding-bottom: 5px;
+  }
+  .qr-card canvas {
+    width: 280px !important;
+    height: 280px !important;
+  }
+}
