@@ -58,7 +58,12 @@ function generateAccount() {
   });
 
   // Generate Auto-Login URL
-  const loginUrl = `${window.location.origin}/index.html?player=${playerId}`;
+  const isLocalhost =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1" ||
+    window.location.hostname === "[::1]";
+
+  const loginUrl = `${window.location.origin + isLocalhost ? "" : "/TheQuest"}/index.html?player=${playerId}`;
 
   qrCodeDisplay.makeCode(loginUrl);
   document.getElementById("loginUrl").innerText = loginUrl;
