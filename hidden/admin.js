@@ -63,7 +63,7 @@ function generateAccount() {
     window.location.hostname === "127.0.0.1" ||
     window.location.hostname === "[::1]";
 
-  const loginUrl = `${window.location.origin + isLocalhost ? "" : "/TheQuest"}/index.html?player=${playerId}`;
+  const loginUrl = `${window.location.origin + (isLocalhost ? "" : "/TheQuest")}/index.html?player=${playerId}`;
 
   qrCodeDisplay.makeCode(loginUrl);
   document.getElementById("loginUrl").innerText = loginUrl;
