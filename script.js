@@ -178,7 +178,7 @@ async function onScanSuccess(decodedText) {
   feedback.style.color = "var(--mantine-blue)";
 
   const currentPackets = playerData.packets || 0;
-  const spaceLeft = 50 - currentPackets;
+  const spaceLeft = 100 - currentPackets;
 
   if (spaceLeft <= 0) {
     feedback.innerText = "Inventory Full! Return to Stall to Upload.";

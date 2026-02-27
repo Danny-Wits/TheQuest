@@ -81,11 +81,10 @@ function forceCrash() {
   db.ref("market/price").set(Math.floor(Math.random() * 20) + 10);
 }
 function forceSpike() {
-  db.ref("market/price").set(Math.floor(Math.random() * 50) + 100);
+  db.ref("market/price").set(Math.floor(Math.random() * 50) + 50);
 }
 
 // --- 5. LEADERBOARD LOGIC ---
-// Ordering by 'data' instead of 'coins'
 db.ref("players")
   .orderByChild("data")
   .limitToLast(10)
